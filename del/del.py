@@ -1,26 +1,42 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 
 class TodoListApp:
     def __init__(self, root):
         self.root = root
         self.root.title("To-Do List")
 
+        # Styling
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+
         self.tasks = []
 
-        self.task_entry = tk.Entry(root, width=40)
-        self.task_entry.grid(row=0, column=0, padx=10, pady=10)
+        # Task Entry
+        self.task_entry = ttk.Entry(root, width=40, font=("Arial", 12))
+        self.task_entry.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
 
-        self.add_button = tk.Button(root, text="Add Task", command=self.add_task, bg="#4CAF50", fg="white")
-        self.add_button.grid(row=0, column=1, padx=10, pady=10)
+        # Add Task Button
+        self.add_button = ttk.Button(root, text="Add Task", command=self.add_task)
+        self.add_button.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
 
-        self.task_list = tk.Listbox(root, width=50, height=10, borderwidth=0, highlightthickness=0)
-        self.task_list.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
+        # Task List
+        self.task_list = tk.Listbox(root, width=50, height=10, font=("Arial", 12), bd=0, highlightthickness=0)
+        self.task_list.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
-        self.delete_button = tk.Button(root, text="Delete Task", command=self.delete_task, bg="#F44336", fg="white")
-        self.delete_button.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="WE")
+        # Scrollbar
+        self.scrollbar = ttk.Scrollbar(root, orient="vertical", command=self.task_list.yview)
+        self.scrollbar.grid(row=1, column=2, sticky="ns")
+        self.task_list.config(yscrollcommand=self.scrollbar.set)
 
-        self.task_list.bind("<<ListboxSelect>>", self.on_select)
+        # Delete Task Button
+        self.delete_button = ttk.Button(root, text="Delete Task", command=self.delete_task)
+        self.delete_button.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+
+        # Set weights for resizing
+        root.columnconfigure(0, weight=1)
+        root.columnconfigure(1, weight=1)
+        root.rowconfigure(1, weight=1)
 
     def add_task(self):
         task = self.task_entry.get()
@@ -38,14 +54,6 @@ class TodoListApp:
             self.task_list.delete(index)
         except IndexError:
             messagebox.showwarning("Warning", "Please select a task to delete.")
-
-    def on_select(self, event):
-        try:
-            index = self.task_list.curselection()[0]
-            task = self.task_list.get(index)
-            messagebox.showinfo("Task Selected", f"Selected Task: {task}")
-        except IndexError:
-            pass
 
 if __name__ == "__main__":
     root = tk.Tk()
