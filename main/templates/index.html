@@ -34,7 +34,8 @@
         }
 
         .button {
-            display: inline-block;
+
+            display: block;
             padding: 10px 20px;
             background-color: #007bff;
             color: #fff;
@@ -63,8 +64,8 @@
         </tr>
         {% endfor %}
     </table>
-    {% if page and scores|length >= 10 %}
-    <a href="/scores/{{ page + 1 }}" class="button">Next Page</a>
+    {% if page and scores|length > 10 %}
+    <button class="button" onclick="window.location.href='/scores/{{ page + 1 }}'">Next Page</button>
     {% endif %}
     <br>
     <button class="button" onclick="window.location.href='/search'">Search</button>
