@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Highest Scores</title>
+    <title>LeaderBoard - CTM</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -33,21 +33,24 @@
             background-color: #222;
         }
 
-        a {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #007bff;
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
             text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
-        a:hover {
-            color: #0056b3;
+        .button:hover {
+            background-color: #42f58a;
         }
     </style>
 </head>
 <body>
-    <h1>Highest Scores</h1>
+    <h1>Leaderboard-  CTM </h1>
     <table>
         <tr>
             <th>Username</th>
@@ -61,9 +64,9 @@
         {% endfor %}
     </table>
     {% if page and scores|length >= 10 %}
-    <a href="/scores/{{ page + 1 }}">Next Page</a>
+    <a href="/scores/{{ page + 1 }}" class="button">Next Page</a>
     {% endif %}
     <br>
-    <a href="/search">Search</a>
+    <button class="button" onclick="window.location.href='/search'">Search</button>
 </body>
 </html>

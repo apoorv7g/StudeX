@@ -14,10 +14,12 @@ class ChaseTheMole:
         self.mole_size = mole_size
         self.time_limit = time_limit
         self.score = 0
+        image = tk.PhotoImage(file="grass.png")
 
-        self.canvas = tk.Canvas(root1, width=self.width, height=self.height, bg="#0fab24")
+        # Create a Canvas
+        self.canvas = tk.Canvas(root1, width=self.width, height=self.height)
+        self.canvas.create_image(self.width // 2, self.height // 2, anchor=tk.CENTER, image=image)
         self.canvas.pack()
-
         self.mole_color = "#9e4a11"
         self.mole_id = None
         self.time_remaining = self.time_limit
