@@ -1,2 +1,2 @@
 # StudeX
-GUI for BAP SEE
+GUI for BAP IA-2
