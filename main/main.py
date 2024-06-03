@@ -20,6 +20,16 @@ def init_db():
     conn.close()
 
 
+def init_db2(username):
+    conn = get_db_connection()
+    curr = conn.cursor()
+    curr.execute(
+        f'CREATE TABLE IF NOT EXISTS {username}(name TEXT NOT NULL PRIMARY KEY, html TEXT NOT NULL, css TEXT NOT NULL, '
+        f'js TEXT NOT NULL)')
+    conn.commit()
+    conn.close()
+
+
 def get_db_connection():
     conn = sqlite3.connect('users.db')
     return conn
@@ -40,6 +50,19 @@ def get_user_by_username(username):
     user = curr.fetchone()
     conn.close()
     return user
+
+
+def fetch_code_from_database(username, proj_name):
+    conn = get_db_connection()
+    curr = conn.cursor()
+    curr.execute(f"SELECT html, css, js FROM {username} WHERE name=?", (proj_name,))
+    row = curr.fetchone()
+    conn.close()
+
+    if row:
+        return row
+    else:
+        return None
 
 
 @app.route("/")
@@ -70,10 +93,89 @@ def login():
 @app.route("/login/successful")
 def login_successful():
     if 'username' in session:
-        return render_template("main.html", username=session['username'])
+        username = session['username']
+        init_db2(username=username)
+        conn = get_db_connection()
+        curr = conn.cursor()
+        curr.execute(f"SELECT name FROM {username}")
+        databases = curr.fetchall()
+        conn.close()
+        return render_template("main.html", username=session['username'], databases=databases)
     else:
         flash('You are not logged in.', 'danger')
         return redirect(url_for('login'))
+
+
+@app.route("/projects")
+def create_project():
+    if 'username' in session:
+        return render_template("create_project.html")
+    else:
+        flash('You are not logged in.', 'danger')
+        return redirect(url_for('login'))
+
+
+@app.route("/load/<proj_name>")
+def load(proj_name):
+    if 'username' in session:
+        html_code, css_code, js_code = fetch_code_from_database(session['username'], proj_name)
+
+        if html_code or css_code or js_code:
+            return render_template("load_file.html", name=proj_name, html_code=html_code, css_code=css_code,
+                                   js_code=js_code)
+        else:
+            return "Error: Project not found."
+    else:
+        flash('You are not logged in.', 'danger')
+        return redirect(url_for('login'))
+
+
+@app.route("/delete/<proj_name>", methods=['GET', 'POST'])
+def delete(proj_name):
+    if 'username' in session:
+        username = session['username']
+        conn = get_db_connection()
+        curr = conn.cursor()
+        try:
+            curr.execute(f'DELETE FROM {username} WHERE name = ?', (proj_name,))
+            conn.commit()
+        finally:
+            conn.close()
+            return redirect(url_for('login_successful'))
+    else:
+        flash('You are not logged in.', 'danger')
+        return redirect(url_for('login'))
+
+
+@app.route("/save", methods=['POST'])
+def save_project():
+    if 'username' not in session:
+        flash('You are not logged in.', 'danger')
+        return redirect(url_for('login'))
+
+    username = session['username']
+    data = request.get_json()
+    proj_name = data.get('name')
+    html = data.get('html')
+    css = data.get('css')
+    js = data.get('js')
+
+    conn = get_db_connection()
+    curr = conn.cursor()
+    try:
+        curr.execute(f'INSERT INTO {username} (name, html, css, js) VALUES (?, ?, ?, ?)',
+                     (proj_name, html, css, js))
+        conn.commit()
+        flash('Project saved successfully!', 'success')
+        return redirect(url_for('login_successful'))
+    except sqlite3.IntegrityError:
+        flash('A project with this name already exists.', 'danger')
+        return redirect(url_for('login_successful'))
+    except Exception as e:
+        flash(f'An error occurred: {str(e)}', 'danger')
+        return redirect(url_for('login_successful'))
+    finally:
+        conn.close()
 
 
 @app.route("/logout")

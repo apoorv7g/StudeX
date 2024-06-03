@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>StudeX-Platform</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            box-sizing: border-box;
+            background-color: #444; /* Darker input background color */
+            color: #fff; /* Light text color */
+        }
+        #editors {
+            display: flex;
+            width: 100%;
+            height: 50%;
+            justify-content: space-around;
+            box-sizing: border-box;
+            padding: 10px;
+        }
+        .editor-container {
+            width: 30%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .editor-title {
+            background-color: black;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            text-align: center;
+            font-weight: bold;
+        }
+        .editor {
+            flex-grow: 1;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        button {
+            display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        margin : 5px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.1/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.64.0/theme/base16-dark.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.1/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.1/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.1/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.1/mode/javascript/javascript.min.js"></script>
+</head>
+<body>
+    <h1>StudeX-Platform</h1>
+    <h2>Name: <input style="height:24px; font-size:18px;" type="text" id="name"></h2>
+    <div id="editors">
+        <div class="editor-container">
+            <div class="editor-title">HTML</div>
+            <textarea id="htmlEditor" class="editor" placeholder="HTML"></textarea>
+        </div>
+        <div class="editor-container">
+            <div class="editor-title">CSS</div>
+            <textarea id="cssEditor" class="editor" placeholder="CSS"></textarea>
+        </div>
+        <div class="editor-container">
+            <div class="editor-title">JavaScript</div>
+            <textarea id="jsEditor" class="editor" placeholder="JavaScript"></textarea>
+        </div>
+    </div>
+
+    <button style="background-color: #210b36" onclick="runCode()">Run</button>
+    <button style="background-color: #0b3136" onclick="saveCode()">Save</button>
+
+    <script>
+        var htmlEditor = CodeMirror.fromTextArea(document.getElementById('htmlEditor'), {
+            mode: 'xml',
+            htmlMode: true,
+            lineNumbers: true,
+            theme: 'base16-dark'
+        });
+        var cssEditor = CodeMirror.fromTextArea(document.getElementById('cssEditor'), {
+            mode: 'css',
+            lineNumbers: true,
+            theme: 'base16-dark'
+        });
+        var jsEditor = CodeMirror.fromTextArea(document.getElementById('jsEditor'), {
+            mode: 'javascript',
+            lineNumbers: true,
+            theme: 'base16-dark'
+        });
+
+        function saveCode() {
+            var name = document.getElementById('name').value;
+            var htmlCode = htmlEditor.getValue();
+            var cssCode = cssEditor.getValue();
+            var jsCode = jsEditor.getValue();
+
+            if (name.length > 0) {
+                fetch(`/save`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        html: htmlCode,
+                        css: cssCode,
+                        js: jsCode
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/login/successful';
+                    } else if (response.status === 400) {
+                        alert('A project with this name already exists.');
+                    } else {
+                        alert('An error occurred while saving the project.');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving the project.');
+                });
+            } else {
+                alert('Please enter a name for your project.');
+            }
+        }
+
+        function runCode() {
+            var htmlCode = htmlEditor.getValue();
+            var cssCode = cssEditor.getValue();
+            var jsCode = jsEditor.getValue();
+
+            var newTabContent = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Online HTML, CSS, and JS Editor Output</title>
+                    <style>${cssCode}</style>
+                </head>
+                <body>
+                    ${htmlCode}
+                    <script>${jsCode}<\/script>
+                <\/body>
+                <\/html>
+            `;
+
+            var newTab = window.open();
+            newTab.document.write(newTabContent);
+            newTab.document.close();
+        }
+    </script>
+</body>
+</html>
