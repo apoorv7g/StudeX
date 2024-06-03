@@ -7,7 +7,6 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 
-# Initialize the database
 def init_db():
     conn = sqlite3.connect('users.db')
     curr = conn.cursor()
@@ -21,13 +20,11 @@ def init_db():
     conn.close()
 
 
-# Get database connection
 def get_db_connection():
     conn = sqlite3.connect('users.db')
     return conn
 
 
-# Hash password
 def hash_password(password):
     password_bytes = password.encode('utf-8')
     hash_algorithm = hashlib.sha256()
@@ -36,7 +33,6 @@ def hash_password(password):
     return hashed_password
 
 
-# Check if username exists
 def get_user_by_username(username):
     conn = get_db_connection()
     curr = conn.cursor()
@@ -46,7 +42,6 @@ def get_user_by_username(username):
     return user
 
 
-# Routes
 @app.route("/")
 def main():
     return redirect(url_for('index'))

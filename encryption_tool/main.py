@@ -5,11 +5,17 @@ app = Flask(__name__)
 
 
 def custom_encrypt(data):
-    return data[::-1]
+    # Ensure data is in bytes
+    encrypted_data = bytes((byte + 1) % 256 for byte in data)
+    return encrypted_data
+
 
 
 def custom_decrypt(data):
-    return data[::-1]
+    # Ensure data is in bytes
+    decrypted_data = bytes((byte - 1) % 256 for byte in data)
+    return decrypted_data
+
 
 
 @app.route('/')

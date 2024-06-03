@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const confirmPassword = confirmPasswordInput.value;
 
         if (!validatePassword(password)) {
-            event.preventDefault(); // Prevent form submission
+            event.preventDefault();
             alert('Password must be at least 8 characters long, contain a capital letter and a number.');
         } else if (password !== confirmPassword) {
-            event.preventDefault(); // Prevent form submission
+            event.preventDefault();
             alert('Passwords do not match. Please try again.');
         }
     });
