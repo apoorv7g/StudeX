@@ -28,6 +28,7 @@
     </style>
 </head>
 <body>
+<div class="background"></div>
     <div class="container">
         <h2>Welcome, {{ username }}!</h2>
 
@@ -35,8 +36,8 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Database Name</th>
-                        <th>Actions</th>
+                        <th style="text-align:center">Project Name</th>
+                        <th style="text-align:center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,7 +45,7 @@
                         <tr>
                             <td>{{ db[0] }}</td>
                             <td style="display: flex; justify-content: space-between;">
-                                <a href="{{ url_for('load', proj_name=db[0]) }}">Load</a>
+                                <a href="{{ url_for('load', proj_name=db[0]) }}" style="background-color:#007bff">Load</a>
                                 <a href="{{ url_for('delete', proj_name=db[0]) }}" style="background-color:red">Delete</a>
                             </td>
                         </tr>
@@ -57,7 +58,7 @@
 
         <p style="display: flex; justify-content: space-between;">
             <a href="{{ url_for('logout') }}" class="alert-danger">Logout</a>
-            <a href="{{ url_for('create_project') }}" class="btn">Projects</a>
+            <a href="{{ url_for('create_project') }}" class="btn" style="background-color:#1ae30b">Create Project</a>
         </p>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}

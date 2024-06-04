@@ -59,6 +59,7 @@
         margin :5px;
         }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.1/codemirror.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.64.0/theme/base16-dark.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.1/codemirror.min.js"></script>
@@ -67,6 +68,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.1/mode/javascript/javascript.min.js"></script>
 </head>
 <body>
+    <div class="background"></div>
     <h1>StudeX-Platform</h1>
     <h2>Name: <input style="height:24px; font-size:18px;" type="text" id="name" value="{{ name }}" disabled></h2>
     <div id="editors">
@@ -124,9 +126,8 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        window.location.href = '/login/successful';
-                    } else if (response.status === 400) {
-                        alert('A project with this name already exists.');
+                    alert('Project Saved Successfully. Redirecting to Home Page');
+                    window.location.href = '/login/successful';
                     } else {
                         alert('An error occurred while saving the project.');
                     }
@@ -149,7 +150,7 @@
                 <html lang="en">
                 <head>
                     <meta charset="UTF-8">
-                    <title>Online HTML, CSS, and JS Editor Output</title>
+                    <title>StudeX - Output</title>
                     <style>${cssCode}</style>
                 </head>
                 <body>

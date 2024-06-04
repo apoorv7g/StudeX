@@ -138,6 +138,7 @@ def delete(proj_name):
         curr = conn.cursor()
         try:
             curr.execute(f'DELETE FROM {username} WHERE name = ?', (proj_name,))
+            flash('Project deleted', 'danger')
             conn.commit()
         finally:
             conn.close()
@@ -147,7 +148,7 @@ def delete(proj_name):
         return redirect(url_for('login'))
 
 
-@app.route("/save", methods=['POST'])
+@app.route("/save", methods=['GET','POST'])
 def save_project():
     if 'username' not in session:
         flash('You are not logged in.', 'danger')
@@ -162,20 +163,17 @@ def save_project():
 
     conn = get_db_connection()
     curr = conn.cursor()
-    try:
-        curr.execute(f'INSERT INTO {username} (name, html, css, js) VALUES (?, ?, ?, ?)',
-                     (proj_name, html, css, js))
-        conn.commit()
-        flash('Project saved successfully!', 'success')
-        return redirect(url_for('login_successful'))
-    except sqlite3.IntegrityError:
-        flash('A project with this name already exists.', 'danger')
-        return redirect(url_for('login_successful'))
-    except Exception as e:
-        flash(f'An error occurred: {str(e)}', 'danger')
-        return redirect(url_for('login_successful'))
-    finally:
-        conn.close()
+    curr.execute(f'''
+                INSERT INTO {username} (name, html, css, js)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(name) DO UPDATE SET
+                html = excluded.html,
+                css = excluded.css,
+                js = excluded.js
+            ''', (proj_name, html, css, js))
+    conn.commit()
+    flash('Project saved successfully!', 'success')
+    return redirect(url_for('login_successful'))
 
 
 @app.route("/logout")
