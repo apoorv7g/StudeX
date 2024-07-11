@@ -24,7 +24,7 @@ def scores(page):
     scores1.sort(key=lambda x: x['score'], reverse=True)
     start_index = (page - 1) * 10
     end_index = min(start_index + 10, len(scores1))
-    return render_template('login.html', scores=scores1[start_index:end_index], page=page)
+    return render_template('index.html', scores=scores1[start_index:end_index], page=page)
 
 
 @app.route('/search', methods=['GET', 'POST'])
